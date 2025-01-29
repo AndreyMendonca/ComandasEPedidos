@@ -1,5 +1,7 @@
 package com.comandaspedidos.service;
 
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -8,9 +10,12 @@ import com.comandaspedidos.models.Pedido;
 import com.comandaspedidos.models.Produto;
 import com.comandaspedidos.models.DTO.ItensPedidoRequestDTO;
 import com.comandaspedidos.models.DTO.PedidoRequestDTO;
+import com.comandaspedidos.models.pk.ItemPedidoPK;
 import com.comandaspedidos.repository.ItemPedidoRepository;
 import com.comandaspedidos.repository.PedidoRepository;
 import com.comandaspedidos.repository.ProdutoRepository;
+
+import jakarta.transaction.Transactional;
 
 @Service
 public class PedidoService {
@@ -39,19 +44,30 @@ public class PedidoService {
 		return repository.save(novoPedido);
 	}
 	
-	public Pedido adicionarItensAoPedido(PedidoRequestDTO peditoDTO, Long idPedido) {
-		Pedido pedidoExistente = this.findById(idPedido);
+	@Transactional
+	public Pedido adicionarItensAoPedido(PedidoRequestDTO peditoDTO, Pedido pedido) {
 		
-		for(ItensPedidoRequestDTO itensPedidoDTO : peditoDTO.getItens()) {
-			Produto produto = produtoRepository.findById(itensPedidoDTO.getIdProduto()).orElseThrow( () -> new RuntimeException("Produto não localizado"));
+		for(ItensPedidoRequestDTO itemPedidoDTO : peditoDTO.getItens()) {
+			Produto produto = produtoRepository.findById(itemPedidoDTO.getIdProduto()).orElseThrow( () -> new RuntimeException("Produto não localizado"));
 			
 			ItemPedido itemPedido = new ItemPedido(
-					pedidoExistente, produto, itensPedidoDTO.getQuantidade(), itensPedidoDTO.getObservacao());
-			itemPedidoRepository.save(itemPedido);
+					pedido, produto, itemPedidoDTO.getQuantidade(), itemPedidoDTO.getObservacao());
 			
-			pedidoExistente.getItens().add(itemPedido);
+			ItemPedidoPK id = new ItemPedidoPK();
+			id.setPedido(pedido);
+			id.setProduto(produto);
+			Optional<ItemPedido> itemPedidoExistente = itemPedidoRepository.findById(id);
+			
+			if(itemPedidoExistente.isPresent()) {
+				itemPedidoExistente.get().setQuantidade( (itemPedidoExistente.get().getQuantidade() + itemPedidoDTO.getQuantidade()) );
+				itemPedidoRepository.save(itemPedidoExistente.get());
+			}else {
+				itemPedidoRepository.save(itemPedido);
+			}
+		
+			pedido.getItens().add(itemPedido);
 		}
-		return repository.save(pedidoExistente);
+		return repository.save(pedido);
 	}
 	
 	public Pedido findById(Long id) {

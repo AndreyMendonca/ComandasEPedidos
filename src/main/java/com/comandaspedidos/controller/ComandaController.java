@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.comandaspedidos.models.Comanda;
+import com.comandaspedidos.models.DTO.PedidoRequestDTO;
 import com.comandaspedidos.service.ComandaService;
 
 @RestController
@@ -29,6 +30,11 @@ public class ComandaController {
 	@ResponseStatus(HttpStatus.CREATED)
 	public Comanda abrirComanda(@RequestBody Comanda comandas) {
 		return service.abrirComanda(comandas);
+	}
+	
+	@PutMapping("/{id}/adicionar")
+	public Comanda adicionarItemsAoPedido(@PathVariable Long id, @RequestBody PedidoRequestDTO pedidoDTO) {
+		return service.adicionarPedido(id, pedidoDTO);
 	}
 	
 	@PutMapping("/{id}/fecharComanda")

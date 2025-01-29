@@ -4,7 +4,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -29,8 +28,4 @@ public class PedidoController {
 		return service.findById(id);
 	}
 	
-	@PutMapping("/{id}")
-	public Pedido adicionarItemAoPedido(@RequestBody PedidoRequestDTO pedidoDTO, @PathVariable Long id) {
-		return service.adicionarItensAoPedido(pedidoDTO, id);
-	}
 }
