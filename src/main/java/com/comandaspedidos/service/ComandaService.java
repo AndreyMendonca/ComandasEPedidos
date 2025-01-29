@@ -19,7 +19,7 @@ public class ComandaService {
 		if(comandaExistente.isEmpty()) {
 			return repository.save(comanda);
 		}
-		throw new RuntimeException("Adicione outra identificacao");
+		throw new RuntimeException("Identificação já está sendo utilizada, adicione outra identificacao");
 	}
 	
 	public Comanda fecharComanda(Long id) {
