@@ -50,6 +50,10 @@ public class PedidoService {
 		for(ItensPedidoRequestDTO itemPedidoDTO : peditoDTO.getItens()) {
 			Produto produto = produtoRepository.findById(itemPedidoDTO.getIdProduto()).orElseThrow( () -> new RuntimeException("Produto não localizado"));
 			
+			if(itemPedidoDTO.getQuantidade() == 0) {
+				itemPedidoDTO.setQuantidade(1);
+			}
+			
 			ItemPedido itemPedido = new ItemPedido(
 					pedido, produto, itemPedidoDTO.getQuantidade(), itemPedidoDTO.getObservacao());
 			
