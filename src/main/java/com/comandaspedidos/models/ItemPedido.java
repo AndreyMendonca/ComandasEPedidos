@@ -1,5 +1,7 @@
 package com.comandaspedidos.models;
 
+import java.math.BigDecimal;
+
 import com.comandaspedidos.models.pk.ItemPedidoPK;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -56,6 +58,10 @@ public class ItemPedido {
 
 	public void setObservacao(String observacao) {
 		this.observacao = observacao;
+	}
+	
+	public BigDecimal getTotalValorParciar() {
+		return this.getProduto().getPrecoVenda().multiply(new BigDecimal(this.quantidade));
 	}
 
 }

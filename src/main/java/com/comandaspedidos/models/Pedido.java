@@ -1,5 +1,6 @@
 package com.comandaspedidos.models;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -37,5 +38,15 @@ public class Pedido {
 	@JsonIgnore
 	public Comanda getComanda() {
 		return this.comanda;
+	}
+	
+	public BigDecimal getValorTotalFinal() {
+		BigDecimal valor = BigDecimal.ZERO;
+		
+		for(ItemPedido item : itens) {
+			valor = valor.add(item.getTotalValorParciar());
+		}
+	
+		return valor;
 	}
 }
