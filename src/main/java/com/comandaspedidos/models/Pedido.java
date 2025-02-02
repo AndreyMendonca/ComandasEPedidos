@@ -40,6 +40,19 @@ public class Pedido {
 		return this.comanda;
 	}
 	
+	@OneToMany(mappedBy = "pedido")
+	public List<Pagamento> pagamento = new ArrayList<>();
+	
+	public BigDecimal getPagamentoTotal() {
+		BigDecimal valor = BigDecimal.ZERO;
+		
+		for(Pagamento p : pagamento) {
+			valor = valor.add(p.getValorPago());
+		}
+		
+		return valor;
+	}
+	
 	public BigDecimal getValorTotalFinal() {
 		BigDecimal valor = BigDecimal.ZERO;
 		

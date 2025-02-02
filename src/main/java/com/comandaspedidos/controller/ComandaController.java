@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.comandaspedidos.models.Comanda;
+import com.comandaspedidos.models.DTO.PagamentoRequestDTO;
 import com.comandaspedidos.models.DTO.PedidoRequestDTO;
 import com.comandaspedidos.service.ComandaService;
 
@@ -40,6 +41,11 @@ public class ComandaController {
 	@PutMapping("/{id}/fecharComanda")
 	public Comanda fecharComanda(@PathVariable Long id) {
 		return service.fecharComanda(id);
+	}
+	
+	@PutMapping("/{id}/pagamento")
+	public Comanda adicionarPagamento(@RequestBody PagamentoRequestDTO pagamentoDTO, @PathVariable Long id) {
+		return service.adicionarPagamento(pagamentoDTO, id);
 	}
 	
 	@GetMapping("/todas")

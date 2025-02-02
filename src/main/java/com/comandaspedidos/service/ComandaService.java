@@ -8,9 +8,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.comandaspedidos.models.Comanda;
+import com.comandaspedidos.models.FormaDePagamento;
+import com.comandaspedidos.models.Pagamento;
 import com.comandaspedidos.models.Pedido;
+import com.comandaspedidos.models.DTO.PagamentoRequestDTO;
 import com.comandaspedidos.models.DTO.PedidoRequestDTO;
 import com.comandaspedidos.repository.ComandaRepository;
+import com.comandaspedidos.repository.FormaDePagamentoRepository;
+import com.comandaspedidos.repository.PagamentoRepository;
 
 @Service
 public class ComandaService {
@@ -19,6 +24,12 @@ public class ComandaService {
 	
 	@Autowired
 	private PedidoService pedidoService;
+	
+	@Autowired
+	private PagamentoRepository pagamentoRepository;
+	
+	@Autowired
+	private FormaDePagamentoRepository formaDePagamentoRepository;
 	
 	public Comanda abrirComanda(Comanda comanda) {
 		Optional<Comanda> comandaExistente = repository.findByAbertaAndIdentificacao(true, comanda.getIdentificacao());
@@ -40,8 +51,30 @@ public class ComandaService {
 		return repository.save(comanda);
 	}
 	
+	public Comanda adicionarPagamento(PagamentoRequestDTO pagamentoDTO, Long idComanda) {
+		Comanda comanda = this.findById(idComanda);
+		
+		Pagamento pagamento = new Pagamento();
+		pagamento.setValorPago(pagamentoDTO.getValorPago());
+		FormaDePagamento formaDePagamento = formaDePagamentoRepository.findById(pagamentoDTO.getFormaDePagamento()).orElseThrow(()-> new RuntimeException("FP não existe"));
+		pagamento.setFormaDePagamento(formaDePagamento);
+		pagamento.setPedido(comanda.getPedido());
+		pagamentoRepository.save(pagamento);
+		
+		if(comanda.getAberta()) {
+			comanda.getPedido().getPagamento().add(pagamento);
+			return repository.save(comanda);
+		}
+		throw new RuntimeException("Comanda fechada");
+	}
+	
 	public Comanda fecharComanda(Long id) {
 		Comanda comanda = this.findById(id);
+		
+		if(comanda.getPedido().getPagamentoTotal().compareTo(comanda.getPedido().getValorTotalFinal()) == -1 ) {
+			throw new RuntimeException("Não foi pago o valor total da comanda");
+		}
+		
 		comanda.setAberta(false);
 		comanda.setFechamento(LocalDateTime.now());
 		return repository.save(comanda);
