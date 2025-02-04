@@ -15,11 +15,12 @@ public class ProdutoService {
 	private ProdutoRepository repository;
 	
 	public Produto save(Produto produto) {
+		produto.setAtivo(true);
 		return repository.save(produto);
 	}
 	
 	public List<Produto> findAll() {
-		return repository.findAll();
+		return repository.findByAtivo(true);
 	}
 	
 	public Produto findById(Long id) {
@@ -28,6 +29,6 @@ public class ProdutoService {
 
 	public void deletar(Long id) {
 		Produto produto = this.findById(id);
-		repository.delete(produto);
+		produto.setAtivo(false);
 	}
 }
