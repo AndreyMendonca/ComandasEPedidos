@@ -5,6 +5,7 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.comandaspedidos.exceptions.ResourceNotFoundException;
 import com.comandaspedidos.models.ItemPedido;
 import com.comandaspedidos.models.Pedido;
 import com.comandaspedidos.models.Produto;
@@ -34,7 +35,7 @@ public class PedidoService {
 		repository.save(novoPedido);
 		
 		for(ItensPedidoRequestDTO itensPedidoDTO : peditoDTO.getItens()) {
-			Produto produto = produtoRepository.findById(itensPedidoDTO.getIdProduto()).orElseThrow( () -> new RuntimeException("Produto não localizado"));
+			Produto produto = produtoRepository.findById(itensPedidoDTO.getIdProduto()).orElseThrow( () -> new ResourceNotFoundException("Produto não localizado"));
 			ItemPedido itemPedido = new ItemPedido(
 					novoPedido, produto, itensPedidoDTO.getQuantidade(), itensPedidoDTO.getObservacao());
 			itemPedidoRepository.save(itemPedido);
@@ -48,7 +49,7 @@ public class PedidoService {
 	public Pedido adicionarItensAoPedido(PedidoRequestDTO peditoDTO, Pedido pedido) {
 		
 		for(ItensPedidoRequestDTO itemPedidoDTO : peditoDTO.getItens()) {
-			Produto produto = produtoRepository.findById(itemPedidoDTO.getIdProduto()).orElseThrow( () -> new RuntimeException("Produto não localizado"));
+			Produto produto = produtoRepository.findById(itemPedidoDTO.getIdProduto()).orElseThrow( () -> new ResourceNotFoundException("Produto não localizado"));
 			
 			if(itemPedidoDTO.getQuantidade() == 0) {
 				itemPedidoDTO.setQuantidade(1);
@@ -75,6 +76,6 @@ public class PedidoService {
 	}
 	
 	public Pedido findById(Long id) {
-		return repository.findById(id).orElseThrow(()-> new RuntimeException("Pedido nao existe"));
+		return repository.findById(id).orElseThrow(()-> new ResourceNotFoundException("Pedido nao existe"));
 	}
 }

@@ -7,6 +7,8 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.comandaspedidos.exceptions.RegraDeNegocioException;
+import com.comandaspedidos.exceptions.ResourceNotFoundException;
 import com.comandaspedidos.models.Comanda;
 import com.comandaspedidos.models.FormaDePagamento;
 import com.comandaspedidos.models.Pagamento;
@@ -39,13 +41,13 @@ public class ComandaService {
 			comanda.setPedido(pedido);
 			return repository.save(comanda);
 		}
-		throw new RuntimeException("Identificação já está sendo utilizada, adicione outra identificacao");
+		throw new RegraDeNegocioException("Identificação já está sendo utilizada, adicione outra identificacao");
 	}
 	
 	public Comanda adicionarPedido(Long idComanda, PedidoRequestDTO pedidoDTO) {
 		Comanda comanda = this.findById(idComanda);
 		if(!comanda.getAberta()) {
-			throw new RuntimeException("Abra a comanda para fazer pedido");
+			throw new RegraDeNegocioException("Abra a comanda para fazer pedido");
 		}
 		pedidoService.adicionarItensAoPedido(pedidoDTO, comanda.getPedido());
 		return repository.save(comanda);
@@ -56,7 +58,7 @@ public class ComandaService {
 		
 		Pagamento pagamento = new Pagamento();
 		pagamento.setValorPago(pagamentoDTO.getValorPago());
-		FormaDePagamento formaDePagamento = formaDePagamentoRepository.findById(pagamentoDTO.getFormaDePagamento()).orElseThrow(()-> new RuntimeException("FP não existe"));
+		FormaDePagamento formaDePagamento = formaDePagamentoRepository.findById(pagamentoDTO.getFormaDePagamento()).orElseThrow(()-> new ResourceNotFoundException("Forma de Pagamento não existe"));
 		pagamento.setFormaDePagamento(formaDePagamento);
 		pagamento.setPedido(comanda.getPedido());
 		pagamentoRepository.save(pagamento);
@@ -65,14 +67,14 @@ public class ComandaService {
 			comanda.getPedido().getPagamento().add(pagamento);
 			return repository.save(comanda);
 		}
-		throw new RuntimeException("Comanda fechada");
+		throw new RegraDeNegocioException("Comanda fechada");
 	}
 	
 	public Comanda fecharComanda(Long id) {
 		Comanda comanda = this.findById(id);
 		
 		if(comanda.getPedido().getPagamentoTotal().compareTo(comanda.getPedido().getValorTotalFinal()) == -1 ) {
-			throw new RuntimeException("Não foi pago o valor total da comanda");
+			throw new RegraDeNegocioException("Não foi pago o valor total da comanda");
 		}
 		
 		comanda.setAberta(false);
@@ -90,8 +92,7 @@ public class ComandaService {
 	}
 	
 	public Comanda findById(Long id) {
-		Optional<Comanda> comanda = repository.findById(id);
-		return comanda.get();
+		return repository.findById(id).orElseThrow(()-> new ResourceNotFoundException("Comanda não localizada"));
 	}
 
 	public void deletar(Long id) {

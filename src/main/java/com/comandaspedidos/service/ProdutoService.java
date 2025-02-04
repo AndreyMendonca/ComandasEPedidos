@@ -1,11 +1,11 @@
 package com.comandaspedidos.service;
 
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.comandaspedidos.exceptions.ResourceNotFoundException;
 import com.comandaspedidos.models.Produto;
 import com.comandaspedidos.repository.ProdutoRepository;
 
@@ -23,8 +23,7 @@ public class ProdutoService {
 	}
 	
 	public Produto findById(Long id) {
-		Optional<Produto> produto = repository.findById(id);
-		return produto.get();
+		return repository.findById(id).orElseThrow(()-> new ResourceNotFoundException("Produto não encontrado"));
 	}
 
 	public void deletar(Long id) {
