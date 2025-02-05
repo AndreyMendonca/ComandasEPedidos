@@ -30,5 +30,6 @@ public class ProdutoService {
 	public void deletar(Long id) {
 		Produto produto = this.findById(id);
 		produto.setAtivo(false);
+		repository.save(produto);
 	}
 }
