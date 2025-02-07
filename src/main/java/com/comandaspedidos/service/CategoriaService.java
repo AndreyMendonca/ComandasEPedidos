@@ -1,6 +1,7 @@
 package com.comandaspedidos.service;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -21,6 +22,12 @@ public class CategoriaService {
 	private ProdutoRepository produtoRepository;
 	
 	public Categoria save(Categoria categoria) {
+		Optional<Categoria> categoriaExistente = repository.findByNomeAndAtivo(categoria.getNome(), true);
+		
+		if(!categoriaExistente.isEmpty()) {
+			throw new RegraDeNegocioException("Já Existe uma categoria com esse nome");
+		}
+		
 		categoria.setAtivo(true);
 		return repository.save(categoria);
 	}
