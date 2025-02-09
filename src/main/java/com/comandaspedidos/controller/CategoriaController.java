@@ -35,6 +35,11 @@ public class CategoriaController {
 		return service.findAll();
 	}
 	
+	@GetMapping("/nome/{nome}")
+	public List<Categoria> findByNome(@PathVariable String nome) {
+		return service.findByNome(nome);
+	}
+	
 	@GetMapping("/{id}")
 	public Categoria findById(@PathVariable Long id) {
 		return service.findById(id);

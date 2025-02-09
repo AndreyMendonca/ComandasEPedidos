@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.comandaspedidos.models.Comanda;
 import com.comandaspedidos.models.DTO.PagamentoRequestDTO;
 import com.comandaspedidos.models.DTO.PedidoRequestDTO;
+import com.comandaspedidos.models.DTO.RelatorioVendasDTO;
 import com.comandaspedidos.service.ComandaService;
 
 @RestController
@@ -58,9 +59,19 @@ public class ComandaController {
 		return service.listaComandasAbertas();
 	}
 	
+	@GetMapping("/nome/{identificacao}")
+	public List<Comanda> findByIdentificacao(@PathVariable String identificacao) {
+		return service.findByIdentificacao(identificacao);
+	}
+	
 	@GetMapping("/{id}")
 	public Comanda findById(@PathVariable Long id) {
 		return service.findById(id);
+	}
+	
+	@GetMapping("/relatorio")
+	public RelatorioVendasDTO relatorio() {
+		return service.relatorio();
 	}
 	
 	@DeleteMapping("/{id}")

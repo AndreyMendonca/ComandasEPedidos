@@ -32,4 +32,8 @@ public class ProdutoService {
 		produto.setAtivo(false);
 		repository.save(produto);
 	}
+	
+	public List<Produto> findByNome(String nome){
+		return repository.findByAtivoAndNomeContainingIgnoreCase(true, nome);
+	}
 }

@@ -34,6 +34,10 @@ public class ProdutoController {
 	public List<Produto> getAll(){
 		return service.findAll();
 	}
+	@GetMapping("/nome/{nome}")
+	public List<Produto> getAll(@PathVariable String nome){
+		return service.findByNome(nome);
+	}
 	
 	@GetMapping("/{id}")
 	public Produto getById(@PathVariable Long id){

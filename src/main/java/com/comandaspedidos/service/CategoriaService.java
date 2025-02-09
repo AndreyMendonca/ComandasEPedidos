@@ -49,4 +49,8 @@ public class CategoriaService {
 		categoria.setAtivo(false);
 		repository.save(categoria);
 	}
+	
+	public List<Categoria> findByNome(String nome){
+		return repository.findByAtivoAndNomeContainingIgnoreCase(true, nome);
+	}
 }

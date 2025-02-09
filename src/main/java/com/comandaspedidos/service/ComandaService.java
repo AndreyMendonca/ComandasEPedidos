@@ -1,5 +1,6 @@
 package com.comandaspedidos.service;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -15,6 +16,7 @@ import com.comandaspedidos.models.Pagamento;
 import com.comandaspedidos.models.Pedido;
 import com.comandaspedidos.models.DTO.PagamentoRequestDTO;
 import com.comandaspedidos.models.DTO.PedidoRequestDTO;
+import com.comandaspedidos.models.DTO.RelatorioVendasDTO;
 import com.comandaspedidos.repository.ComandaRepository;
 import com.comandaspedidos.repository.FormaDePagamentoRepository;
 import com.comandaspedidos.repository.PagamentoRepository;
@@ -87,6 +89,10 @@ public class ComandaService {
 		return comanda;
 	}
 	
+	public List<Comanda> findByIdentificacao(String identificacao){
+		return repository.findByAbertaAndIdentificacaoContainingIgnoreCase(true, identificacao);
+	}
+	
 	public List<Comanda> findAll() {
 		return repository.findAll();
 	}
@@ -98,5 +104,35 @@ public class ComandaService {
 	public void deletar(Long id) {
 		Comanda comanda = this.findById(id);
 		repository.delete(comanda);
+	}
+	
+	public RelatorioVendasDTO relatorio(){
+		RelatorioVendasDTO dto = new RelatorioVendasDTO();
+		List<Comanda> comandasDia = comandasDia();
+		List<Comanda> comandasMes = comandasMes();
+		
+		BigDecimal valorDia = BigDecimal.ZERO;
+		for(Comanda comanda : comandasDia) {
+			valorDia = valorDia.add(comanda.getPedido().getValorTotalFinal());
+		}
+		
+		BigDecimal valorMes = BigDecimal.ZERO;
+		for(Comanda comanda : comandasMes) {
+			valorMes = valorMes.add(comanda.getPedido().getValorTotalFinal());
+		}
+		
+		dto.setVendasDia(comandasDia.size());
+		dto.setTotalReaisDia(valorDia);
+		dto.setTotalReaisMes(valorMes);
+
+		return dto;
+	}
+	
+	private List<Comanda> comandasDia(){
+		return repository.findComandasDoDia();
+	}
+	
+	private List<Comanda> comandasMes(){
+		return repository.findComandasDoMes();
 	}
 }
